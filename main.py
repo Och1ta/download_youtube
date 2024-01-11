@@ -1,35 +1,25 @@
+import asyncio
+import logging
 import os
 
-import pytube
-import telebot
+from aiogram import Bot, Dispatcher
+from aiogram.enums.parse_mode import ParseMode
+from aiogram.fsm.storage.memory import MemoryStorage
 from dotenv import load_dotenv
-from win32comext.shell import shell, shellcon
+
+from handlers.users import download
 
 load_dotenv()
 
-bot = telebot.TeleBot(os.getenv("BOT_TOKEN"))
+
+async def main():
+    bot = Bot(os.getenv('BOT_TOKEN'), parse_mode=ParseMode.HTML)
+    dp = Dispatcher(storage=MemoryStorage())
+    dp.include_router(download.router)
+    await bot.delete_webhook(drop_pending_updates=True)
+    await dp.start_polling(bot, allowed_updates=dp.resolve_used_update_types())
 
 
-@bot.message_handler(content_types=['text'])
-def download_video(message):
-    bot.send_message(message.chat.id, text="Ссылка получена")
-
-    try:
-        youtubelink = pytube.YouTube(message.text)
-        video = youtubelink.streams.get_highest_resolution()
-        video.download(
-            output_path=shell.SHGetKnownFolderPath(
-                shellcon.FOLDERID_Downloads
-            )
-        )
-        print(shell.SHGetKnownFolderPath(shellcon.FOLDERID_Downloads))
-        bot.send_message(
-            message.chat.id,
-            text=f"Готово загрузка завершена файл находится по пути:\n"
-                 f"{shell.SHGetKnownFolderPath(shellcon.FOLDERID_Downloads)}"
-        )
-    except:
-        bot.send_message(message.chat.id, text="Ошибка. Проверьте ссылку")
-
-
-bot.polling(none_stop=True)
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
+    asyncio.run(main())
