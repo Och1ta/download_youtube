@@ -30,7 +30,7 @@ pip install -r requirements.txt
 ````
 BOT_TOKEN='Токен телеграмм бота'
 ````
-Выполняется токен бота можно узнать с помощью [BotFather](https://sendpulse.com/ru/knowledge-base/chatbot/telegram/create-telegram-chatbot)
+Токен бота можно узнать с помощью [BotFather](https://sendpulse.com/ru/knowledge-base/chatbot/telegram/create-telegram-chatbot)
 
 ### Автор:
 
