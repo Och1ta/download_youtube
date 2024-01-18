@@ -1,25 +1,16 @@
-import asyncio
 import logging
-import os
 
-from aiogram import Bot, Dispatcher
-from aiogram.enums.parse_mode import ParseMode
-from aiogram.fsm.storage.memory import MemoryStorage
-from dotenv import load_dotenv
+from aiogram import executor
 
-from handlers.users import download
-
-load_dotenv()
+from loader import dp
+import handlers
+from utils.set_bot_commands import set_default_commands
 
 
-async def main():
-    bot = Bot(os.getenv('BOT_TOKEN'), parse_mode=ParseMode.HTML)
-    dp = Dispatcher(storage=MemoryStorage())
-    dp.include_router(download.router)
-    await bot.delete_webhook(drop_pending_updates=True)
-    await dp.start_polling(bot, allowed_updates=dp.resolve_used_update_types())
+async def main(dispatcher):
+    await set_default_commands(dispatcher)
 
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
-    asyncio.run(main())
+    executor.start_polling(dp, on_startup=main)
